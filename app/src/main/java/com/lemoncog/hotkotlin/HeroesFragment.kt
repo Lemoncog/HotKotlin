@@ -101,7 +101,6 @@ class HeroesFragment : LifecycleFragment() {
         heroesAdapter.setHasStableIds(true)
         heroesRecyclerView.adapter = heroesAdapter
         heroesRecyclerView.layoutManager = GridLayoutManager(context, 2);
-        heroesRecyclerView.itemAnimator
 
         heroesListViewModel.getHeroesList().observe(this, Observer { heroesListViewModel ->
             onLoad(heroesAdapter, heroesListViewModel!!)
