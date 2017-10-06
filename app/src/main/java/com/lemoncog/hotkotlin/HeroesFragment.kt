@@ -90,47 +90,51 @@ class HeroesFragment : LifecycleFragment() {
         heroesRecyclerView.itemAnimator
 
         heroesListViewModel.getHeroesList().observe(this, Observer { heroesListViewModel ->
-
-            heroesAdapter.heroesList = heroesListViewModel!!
-            heroesAdapter.notifyDataSetChanged()
-
-            val supportCheckbox = rootView.findViewById(R.id.type_filter_support) as CheckBox
-            val assassinCheckbox = rootView.findViewById(R.id.type_filter_assassin) as CheckBox
-            val specialistCheckbox = rootView.findViewById(R.id.type_filter_specialist) as CheckBox
-            val warriorCheckbox = rootView.findViewById(R.id.type_filter_warrior) as CheckBox
-
-            val checkedFilters = CheckedFilters()
-
-            val filterChecksView = FilterChecksView(supportCheckbox, assassinCheckbox, specialistCheckbox, warriorCheckbox)
-            filterChecksView.onSupportCheckChanged = { checked ->
-                checkedFilters.supportChecked = checked
-
-                heroesAdapter.heroesList = filter(checkedFilters, heroesListViewModel)
-                heroesAdapter.notifyDataSetChanged()
-            }
-
-            filterChecksView.onAssassinCheckChanged = { checked ->
-                checkedFilters.assassinChecked = checked
-
-                heroesAdapter.heroesList = filter(checkedFilters, heroesListViewModel)
-                heroesAdapter.notifyDataSetChanged()
-            }
-
-            filterChecksView.onSpecialistCheckChanged = { checked ->
-                checkedFilters.specialistChecked = checked
-
-                heroesAdapter.heroesList = filter(checkedFilters, heroesListViewModel)
-                heroesAdapter.notifyDataSetChanged()
-            }
-
-            filterChecksView.onWarriorCheckChanged = { checked ->
-                checkedFilters.warriorChecked = checked
-
-                heroesAdapter.heroesList = filter(checkedFilters, heroesListViewModel)
-                heroesAdapter.notifyDataSetChanged()
-            }
+            load(heroesAdapter, heroesListViewModel!!)
         });
     }
+
+    fun HeroesFragment.load(adapter: HeroesAdapter, heroesListViewModel: HeroesList) {
+        adapter.heroesList = heroesListViewModel!!
+        adapter.notifyDataSetChanged()
+
+        val supportCheckbox = rootView.findViewById(R.id.type_filter_support) as CheckBox
+        val assassinCheckbox = rootView.findViewById(R.id.type_filter_assassin) as CheckBox
+        val specialistCheckbox = rootView.findViewById(R.id.type_filter_specialist) as CheckBox
+        val warriorCheckbox = rootView.findViewById(R.id.type_filter_warrior) as CheckBox
+
+        val checkedFilters = CheckedFilters()
+
+        val filterChecksView = FilterChecksView(supportCheckbox, assassinCheckbox, specialistCheckbox, warriorCheckbox)
+        filterChecksView.onSupportCheckChanged = { checked ->
+            checkedFilters.supportChecked = checked
+
+            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.notifyDataSetChanged()
+        }
+
+        filterChecksView.onAssassinCheckChanged = { checked ->
+            checkedFilters.assassinChecked = checked
+
+            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.notifyDataSetChanged()
+        }
+
+        filterChecksView.onSpecialistCheckChanged = { checked ->
+            checkedFilters.specialistChecked = checked
+
+            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.notifyDataSetChanged()
+        }
+
+        filterChecksView.onWarriorCheckChanged = { checked ->
+            checkedFilters.warriorChecked = checked
+
+            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.notifyDataSetChanged()
+        }
+    }
+
 
     fun filter(checkedFilters: CheckedFilters, heroesList: HeroesList): HeroesList {
         val filterHeroes = mutableListOf<Hero>()
