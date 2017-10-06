@@ -22,9 +22,33 @@ class RunOnMainThread(val activity: Activity) {
     }
 }
 
+fun HeroesList.filter(checkedFilters: CheckedFilters): HeroesList {
+    val filterHeroes = mutableListOf<Hero>()
+    filterHeroes.addAll(heroesList)
+
+    if (!checkedFilters.assassinChecked) {
+        filterHeroes.removeAll { it.group == Group.Assassin }
+    }
+
+    if (!checkedFilters.specialistChecked) {
+        filterHeroes.removeAll { it.group == Group.Specialist }
+    }
+
+    if (!checkedFilters.supportChecked) {
+        filterHeroes.removeAll { it.group == Group.Support }
+    }
+
+    if (!checkedFilters.warriorChecked) {
+        filterHeroes.removeAll { it.group == Group.Warrior }
+    }
+
+
+    return HeroesList(filterHeroes)
+}
+
 class HeroesFragment : LifecycleFragment() {
-    lateinit var rootView : View
-    lateinit var filterChecks : FilterChecksView
+    lateinit var rootView: View
+    lateinit var filterChecks: FilterChecksView
     val checkedFilters = CheckedFilters()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,7 +63,7 @@ class HeroesFragment : LifecycleFragment() {
 
         val runOnMain = RunOnMainThread(activity)
 
-        val heroesListViewModel = ViewModelProviders.of(this,  object : ViewModelProvider.Factory {
+        val heroesListViewModel = ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(aClass: Class<T>): T {
                 val heroesListProvider = HeroesListProvider()
                 return HeroesListViewModel(heroesListProvider, runOnMain) as T
@@ -73,55 +97,30 @@ class HeroesFragment : LifecycleFragment() {
         filterChecksView.onSupportCheckChanged = { checked ->
             checkedFilters.supportChecked = checked
 
-            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
             adapter.notifyDataSetChanged()
         }
 
         filterChecksView.onAssassinCheckChanged = { checked ->
             checkedFilters.assassinChecked = checked
 
-            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
             adapter.notifyDataSetChanged()
         }
 
         filterChecksView.onSpecialistCheckChanged = { checked ->
             checkedFilters.specialistChecked = checked
 
-            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
             adapter.notifyDataSetChanged()
         }
 
         filterChecksView.onWarriorCheckChanged = { checked ->
             checkedFilters.warriorChecked = checked
 
-            adapter.heroesList = filter(checkedFilters, heroesListViewModel)
+            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
             adapter.notifyDataSetChanged()
         }
-    }
-
-
-    fun filter(checkedFilters: CheckedFilters, heroesList: HeroesList): HeroesList {
-        val filterHeroes = mutableListOf<Hero>()
-        filterHeroes.addAll(heroesList.heroesList)
-
-        if(!checkedFilters.assassinChecked) {
-            filterHeroes.removeAll { it.group == Group.Assassin }
-        }
-
-        if(!checkedFilters.specialistChecked) {
-            filterHeroes.removeAll { it.group == Group.Specialist }
-        }
-
-        if(!checkedFilters.supportChecked) {
-            filterHeroes.removeAll { it.group == Group.Support }
-        }
-
-        if(!checkedFilters.warriorChecked) {
-            filterHeroes.removeAll { it.group == Group.Warrior }
-        }
-
-
-        return HeroesList(filterHeroes)
     }
 }
 
