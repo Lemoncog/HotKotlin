@@ -10,52 +10,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.TextView
 import com.lemoncog.hotkotlin.model.Group
 import com.lemoncog.hotkotlin.model.Hero
 import com.lemoncog.hotkotlin.model.HeroesList
 import com.lemoncog.hotkotlin.service.model.HeroesListProvider
-import java.util.*
+import com.lemoncog.hotkotlin.view.HeroesAdapter
 
 class RunOnMainThread(val activity: Activity) {
     fun postRunnable(runnable: () -> Unit) {
         activity.runOnUiThread(runnable)
-    }
-}
-
-class CheckedFilters {
-    var supportChecked : Boolean = true
-    var assassinChecked : Boolean = true
-    var specialistChecked : Boolean = true
-    var warriorChecked : Boolean = true
-}
-
-class FilterChecksView(val supportCheckBox: CheckBox, val assassinCheckBox: CheckBox, val specialistCheckBox: CheckBox, val warriorCheckBox: CheckBox) {
-    lateinit var onSupportCheckChanged : (Boolean) -> Unit;
-    lateinit var onAssassinCheckChanged : (Boolean) -> Unit;
-    lateinit var onSpecialistCheckChanged : (Boolean) -> Unit;
-    lateinit var onWarriorCheckChanged : (Boolean) -> Unit;
-
-    init {
-        supportCheckBox.setOnCheckedChangeListener(
-                { _, checked ->
-                    onSupportCheckChanged(checked)
-                })
-
-        assassinCheckBox.setOnCheckedChangeListener(
-                { _, checked ->
-                    onAssassinCheckChanged(checked)
-                })
-
-        specialistCheckBox.setOnCheckedChangeListener(
-                { _, checked ->
-                    onSpecialistCheckChanged(checked)
-                })
-
-        warriorCheckBox.setOnCheckedChangeListener(
-                { _, checked ->
-                    onWarriorCheckChanged(checked)
-                })
     }
 }
 
@@ -75,6 +38,7 @@ class HeroesFragment : LifecycleFragment() {
         super.onActivityCreated(savedInstanceState)
 
         val runOnMain = RunOnMainThread(activity)
+
         val heroesListViewModel = ViewModelProviders.of(this,  object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(aClass: Class<T>): T {
                 val heroesListProvider = HeroesListProvider()
@@ -90,12 +54,12 @@ class HeroesFragment : LifecycleFragment() {
         heroesRecyclerView.itemAnimator
 
         heroesListViewModel.getHeroesList().observe(this, Observer { heroesListViewModel ->
-            load(heroesAdapter, heroesListViewModel!!)
+            onLoad(heroesAdapter, heroesListViewModel!!)
         });
     }
 
-    fun HeroesFragment.load(adapter: HeroesAdapter, heroesListViewModel: HeroesList) {
-        adapter.heroesList = heroesListViewModel!!
+    fun onLoad(adapter: HeroesAdapter, heroesListViewModel: HeroesList) {
+        adapter.heroesList = heroesListViewModel
         adapter.notifyDataSetChanged()
 
         val supportCheckbox = rootView.findViewById(R.id.type_filter_support) as CheckBox
@@ -161,41 +125,3 @@ class HeroesFragment : LifecycleFragment() {
     }
 }
 
-class HeroViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val title : TextView = itemView.findViewById(R.id.title) as TextView
-    val subGroup : TextView = itemView.findViewById(R.id.subgroup) as TextView
-    val rootView = itemView.findViewById(R.id.hero_view_root)
-    val groupSymbol = itemView.findViewById(R.id.group_symbol)
-
-}
-
-class HeroesAdapter(val inflater: LayoutInflater) : RecyclerView.Adapter<HeroViewHolder>() {
-    var heroesList = HeroesList(Collections.emptyList());
-
-    override fun getItemCount(): Int {
-        return heroesList.heroesList.size
-    }
-
-    override fun onBindViewHolder(holder: HeroViewHolder, position: Int) {
-        val hero = heroesList.heroesList.get(position)
-        holder.title.text = hero.name
-        holder.subGroup.text = hero.subGroup
-
-        var backgroundColor : Int = 0
-
-        when(hero.group) {
-            Group.Specialist -> backgroundColor = R.color.class_specialist
-            Group.Warrior -> backgroundColor = R.color.class_warrior
-            Group.Support -> backgroundColor = R.color.class_support
-            Group.Assassin -> backgroundColor = R.color.class_assassin
-            Group.Unknown -> backgroundColor = R.color.class_unknown
-        }
-
-        holder.groupSymbol.setBackgroundResource(backgroundColor);
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): HeroViewHolder {
-        return HeroViewHolder(inflater.inflate(R.layout.hero_view, parent, false))
-    }
-
-}
