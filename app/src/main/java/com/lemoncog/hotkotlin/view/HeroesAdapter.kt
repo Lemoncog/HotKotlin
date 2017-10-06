@@ -19,6 +19,7 @@ class HeroesAdapter(val inflater: LayoutInflater) : RecyclerView.Adapter<HeroVie
         val hero = heroesList.heroesList.get(position)
         holder.title.text = hero.name
         holder.subGroup.text = hero.subGroup
+        holder.playsInfo.text = String.format("${hero.played}:${hero.wins}:${hero.losses}")
 
         var backgroundColor : Int = 0
 

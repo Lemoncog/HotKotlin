@@ -6,10 +6,14 @@ import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.EditText
 import com.lemoncog.hotkotlin.model.Group
 import com.lemoncog.hotkotlin.model.Hero
 import com.lemoncog.hotkotlin.model.HeroesList
@@ -20,6 +24,28 @@ class RunOnMainThread(val activity: Activity) {
     fun postRunnable(runnable: () -> Unit) {
         activity.runOnUiThread(runnable)
     }
+}
+
+fun EditText.onTextChange(onChange: (String) -> Unit) {
+    val textChangeWatcher = object: TextWatcher {
+        override fun afterTextChanged(newValue: Editable?) {
+            onChange(newValue.toString())
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+    }
+
+    addTextChangedListener(textChangeWatcher)
+}
+
+fun HeroesList.filter(value: String): HeroesList {
+    return HeroesList(heroesList.filter { (_, name, subGroup) ->
+        val lowerCaseFilter = value.toLowerCase()
+        name.toLowerCase().contains(lowerCaseFilter) || subGroup.toLowerCase().contains(lowerCaseFilter)
+    })
 }
 
 fun HeroesList.filter(checkedFilters: CheckedFilters): HeroesList {
@@ -86,6 +112,13 @@ class HeroesFragment : LifecycleFragment() {
         adapter.heroesList = heroesListViewModel
         adapter.notifyDataSetChanged()
 
+        val filterView = rootView.findViewById(R.id.magic_filter) as EditText
+        filterView.onTextChange {
+            newValue ->
+            adapter.heroesList = heroesListViewModel.filter(newValue)
+            adapter.notifyDataSetChanged()
+        }
+
         val supportCheckbox = rootView.findViewById(R.id.type_filter_support) as CheckBox
         val assassinCheckbox = rootView.findViewById(R.id.type_filter_assassin) as CheckBox
         val specialistCheckbox = rootView.findViewById(R.id.type_filter_specialist) as CheckBox
@@ -97,30 +130,31 @@ class HeroesFragment : LifecycleFragment() {
         filterChecksView.onSupportCheckChanged = { checked ->
             checkedFilters.supportChecked = checked
 
-            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
-            adapter.notifyDataSetChanged()
+            filterAndUpdateAdapter(adapter, heroesListViewModel, checkedFilters)
         }
 
         filterChecksView.onAssassinCheckChanged = { checked ->
             checkedFilters.assassinChecked = checked
 
-            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
-            adapter.notifyDataSetChanged()
+            filterAndUpdateAdapter(adapter, heroesListViewModel, checkedFilters)
         }
 
         filterChecksView.onSpecialistCheckChanged = { checked ->
             checkedFilters.specialistChecked = checked
 
-            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
-            adapter.notifyDataSetChanged()
+            filterAndUpdateAdapter(adapter, heroesListViewModel, checkedFilters)
         }
 
         filterChecksView.onWarriorCheckChanged = { checked ->
             checkedFilters.warriorChecked = checked
 
-            adapter.heroesList = heroesListViewModel.filter(checkedFilters)
-            adapter.notifyDataSetChanged()
+            filterAndUpdateAdapter(adapter, heroesListViewModel, checkedFilters)
         }
+    }
+
+    private fun filterAndUpdateAdapter(adapter: HeroesAdapter, heroesListViewModel: HeroesList, checkedFilters: CheckedFilters) {
+        adapter.heroesList = heroesListViewModel.filter(checkedFilters)
+        adapter.notifyDataSetChanged()
     }
 }
 

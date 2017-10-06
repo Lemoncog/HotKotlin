@@ -10,5 +10,6 @@ class HeroViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val subGroup : TextView = itemView.findViewById(R.id.subgroup) as TextView
     val rootView = itemView.findViewById(R.id.hero_view_root)
     val groupSymbol = itemView.findViewById(R.id.group_symbol)
+    val playsInfo = itemView.findViewById(R.id.plays_info) as TextView
 
 }

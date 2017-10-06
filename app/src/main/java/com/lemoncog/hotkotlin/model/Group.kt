@@ -12,6 +12,16 @@ fun fromString(value: String) : Group {
     return Group.Unknown
 }
 
+fun toString(group: Group) : String {
+    return when(group) {
+        Group.Specialist -> "Specialist"
+        Group.Assassin -> "Assassin"
+        Group.Warrior -> "Warrior"
+        Group.Support -> "Support"
+        Group.Unknown -> "Unknown"
+    }
+}
+
 enum class Group {
     Specialist, Assassin, Warrior, Support, Unknown;
 }

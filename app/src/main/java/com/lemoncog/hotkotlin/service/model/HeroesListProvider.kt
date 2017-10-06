@@ -33,7 +33,7 @@ class HeroesListProvider {
                     .map { jsonList.getJSONObject(it) }
                     .mapTo(heroesListArray)
                     {
-                        Hero(index++, it.getString("PrimaryName"), it.getString("SubGroup"), fromString(it.getString("Group")), played = rand.nextInt(10), wins = rand.nextInt(5), losses = rand.nextInt(5))
+                        Hero(index++, it.getString("PrimaryName"), it.getString("SubGroup"), fromString(it.getString("Group")), played = 5+rand.nextInt(10), wins = rand.nextInt(5), losses = rand.nextInt(5))
                     }
 
 
